@@ -307,3 +307,6 @@ storage.json
 saves/*
 !.gitkeep
 build
+# Datos del servidor de aula (cada docente tiene los suyos, no se suben)
+tareas.json
+resultados.json

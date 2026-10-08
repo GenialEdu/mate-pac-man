@@ -1,0 +1,146 @@
+MATE PAC-MAN WEB — Cómo probarlo en tu PC
+============================================
+
+1) Abre una terminal en esta carpeta (web/) y levanta el servidor:
+     python3 -m http.server 8000
+   Si dice "Address already in use", usa otro puerto, por ejemplo:
+     python3 -m http.server 8901
+
+2) Abre en tu navegador (Brave, Firefox, Chrome o Edge sirven igual):
+     http://localhost:8000
+   (o http://localhost:8901 si usaste ese puerto)
+
+   Tip: también puedes abrir index.html con doble clic, pero con
+   servidor funciona igual en todos los navegadores y es como se
+   probará luego en celular/tablet.
+
+3) El menú está agrupado por nivel (acordeón): toca "Nivel 1 ·
+   Aritmética" para desplegar sus subniveles 1-1 a 1-5, y así con
+   cada grupo. Cada grupo muestra cuántos subniveles ya superaste
+   (p. ej. 2/5). Toca un subnivel para ver de qué trata, escribe tu
+   nombre, elige tu avatar matemático (Σ π √ ∞ Δ φ ± %) y pulsa JUGAR.
+   Para oír los sonidos el navegador pide un clic primero: el botón
+   JUGAR ya cuenta como ese permiso.
+
+Controles
+---------
+PC: flechas o WASD para moverse, P o Esc = pausa, Enter = empezar.
+Móvil/tablet: desliza el dedo sobre el laberinto o usa la cruceta.
+
+Cómo se juega (Nivel 1-1 integrado al laberinto)
+------------------------------------------------
+- Arriba aparece la operación, p. ej. "8 + 7 = ?"
+- En el laberinto hay 4 píldoras grandes con posibles respuestas.
+- Cómete la correcta: +100 puntos, sumas 1 acierto y sale una
+  pregunta nueva (aleatoria, nunca se repite la partida).
+- Si comes una incorrecta: pierdes 1 vida y sale otra pregunta.
+- Cerca de la meta (últimos 2 aciertos, 1 en Nivel 0) los fantasmas
+  se ponen nerviosos: van 30% más rápido, llevan "!" encima y el
+  marcador avisa. Es el empujón final de cada nivel.
+- Cada ~15 segundos aparece una estrella dorada: cómetela y quita
+  dos respuestas falsas (queda la correcta + 1, efecto 50/50).
+  Dura 12 segundos y parpadea los últimos 3 antes de apagarse.
+- El marcador "Aciertos" muestra tu avance y la meta:
+    Nivel 0  -> meta de 3 aciertos, vidas infinitas (∞).
+    Niveles 1 (aritmética), 2 (fracciones), 3 (signos),
+    4 (álgebra) y 5 (trigonometría), cada uno con 5 subniveles
+      -> meta de 5 aciertos, 3 vidas.
+- Al ganar aparece el botón "Siguiente" para pasar al subnivel
+  que sigue (0 -> 1-1 -> 1-2 ... -> 1-5). También puedes elegir
+  cualquier subnivel desde el Menú.
+- Los puntitos pequeños dan 10 puntos (sabor clásico).
+- Si te quedas sin vidas (3 fallos entre respuestas malas y
+  fantasmas) el juego termina: es lo esperado, no un error.
+
+Si los fantasmas te estresan
+----------------------------
+- Nivel 0: el fantasma ya no te caza, solo pasea aleatorio y es
+  más lento. Además tienes vidas infinitas.
+- Modo tranquilo: en el menú marca la casilla "sin fantasmas"
+  y juega cualquier nivel solo contra las preguntas.
+
+Tu nombre, avatar y estadísticas
+--------------------------------
+- En el menú escribes tu nombre y eliges un avatar matemático.
+- Se guardan en tu navegador (localStorage): nombre, avatar,
+  récord por nivel, partidas jugadas y aciertos totales.
+  Sí: es almacenamiento del navegador, no sale de tu PC, pero se
+  borra si borras los datos del sitio. A futuro se podrá exportar
+  para el docente.
+
+Jugadores avanzados
+-------------------
+- Puedes elegir cualquier nivel manualmente tocando su botón,
+  sin tener que pasar los anteriores.
+- Debajo de los botones aparece la descripción del nivel
+  seleccionado (qué operaciones trae, cuántos fantasmas y la meta).
+- Cada nivel tiene su color de laberinto (0 clásico azul,
+  1 violeta, 2 teal, 3 brasa, 4 bosque, 5 dulce) sobre fondo
+  oscuro para que Pac y los fantasmas siempre se distingan.
+- Todas las píldoras de respuesta son del mismo color a propósito:
+  hay que calcular, no vale adivinar por el color.
+- Enlace directo: .../index.html?jugar=13 empieza el 3-3;
+  ?nivel=13 solo lo preselecciona.
+
+Cambiar la meta de aciertos por nivel/subnivel
+----------------------------------------------
+- Abre web/mate.js y busca LEVELS. Cada nivel tiene goal: 3
+  (Nivel 0) o goal: 5 (el resto). Cambia el número y listo:
+  el marcador "Aciertos x/meta" y la victoria lo usan solos.
+  Ej: para pedir 7 aciertos en el 1-5, cambia su goal: 5 por
+  goal: 7 y recarga con Ctrl+F5.
+
+Archivos
+--------
+index.html : página, marcador, menús y cruceta táctil.
+mate.js    : juego completo (laberinto, Pac, fantasmas, generador
+             aleatorio de preguntas, sonidos). Sin dependencias.
+
+Problemas comunes
+-----------------
+- Sin sonido: pulsa JUGAR con clic (no solo con Enter) y revisa
+  que la pestaña no esté silenciada.
+- Puerto ocupado: cambia el número (8000 -> 8901) y abre esa URL.
+- En red local (probar en tu celular): en vez de localhost usa la
+  IP de tu PC, p. ej. http://192.168.1.20:8000 (y permite el puerto
+  si el firewall pregunta).
+
+Módulo docente + aula en red local
+-----------------------------------
+El juego guarda todo en cada navegador. Para el salón:
+
+"Red local" NO es crear nada especial: es simplemente que la PC del
+docente y los celulares estén conectados al MISMO wifi (el de la
+escuela o el de tu casa). Internet NO se necesita, solo estar en
+la misma red. Si el wifi de la escuela bloquea la comunicación entre
+dispositivos, alternativa: crea un punto de acceso (hotspot) desde
+tu celular o tu laptop y conecta ahí tu PC y los celulares.
+
+1) En tu PC (la del docente) corre, desde la carpeta mate-pac-man:
+     python3 servidor_docente.py
+   (no instala nada, usa solo la biblioteca estándar).
+   Te imprime dos direcciones: la de alumnos y la del panel.
+
+2) Alumnos: abren http://IP:8000 en su celular, escriben su nombre
+   y juegan normal o con el código de tarea que dictes.
+   Al terminar cada partida el resultado viaja solo a tu PC.
+
+3) El alumno puede practicar en casa SIN el docente: abre el juego
+   (doble clic a index.html o con python3 -m http.server) y juega
+   libre o con un código de tarea que ya tenga. Sus resultados se
+   quedan en su dispositivo hasta que se conecte al servidor.
+
+3) Docente: abre http://IP:8000/docente con tu PIN (cámbialo en
+   DOCENTE_PIN dentro de servidor_docente.py).
+   - Crea tareas: eliges nivel, meta y reglas (sin comodín S,
+     tranquilo forzado T). Te da un código corto tipo "8-7-S"
+     para dictar o poner en el pizarrón.
+   - El alumno escribe el código en el menú ("Jugar tarea") y juega
+     con esas reglas; su marcador muestra "Tarea 8-7-S".
+   - Si practicó en casa sin servidor, tiene el botón "Enviar mis
+     resultados al docente": los reenvía todos juntos al volver al
+     aula (con id único, no se duplican; lo enviado se borra local).
+   - Ves la tabla de resultados (fecha, alumno, tarea, aciertos,
+     puntos, tiempo, ganó), filtras y descargas CSV para Excel.
+   - Sin servidor también funciona en modo local: tareas y
+     resultados de ese mismo dispositivo.

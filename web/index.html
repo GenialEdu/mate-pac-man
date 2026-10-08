@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mate Pac-Man · Niveles 0 al 5</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #050514; color: #fff; font-family: monospace;
+         display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+  header { width: 100%; max-width: 640px; padding: 10px 12px 0; text-align: center; }
+  h1 { margin: 2px 0 6px; font-size: 20px; color: #ffe14d; letter-spacing: 1px; }
+  #levelName { font-size: 13px; color: #8ef; margin-bottom: 6px; }
+  #hud { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; font-size: 14px; margin-bottom: 6px; }
+  #hud .box { background: #141444; border: 1px solid #3333aa; border-radius: 8px; padding: 4px 10px; }
+  #op { font-size: 26px; font-weight: bold; color: #ffe14d; background: #141444;
+        border: 2px solid #ffe14d; border-radius: 10px; padding: 6px 14px; margin: 2px 0 8px;
+        min-height: 46px; display: inline-block; }
+  #wrap { position: relative; width: 100%; max-width: 640px; padding: 0 8px; }
+  canvas { width: 100%; height: auto; display: block; background: #000;
+           border: 3px solid #2222ee; border-radius: 10px; touch-action: none; }
+  #overlay { position: absolute; inset: 0; margin: 0 8px; display: flex; flex-direction: column;
+             align-items: center; justify-content: flex-start; gap: 10px; text-align: center;
+             background: rgba(5,5,20,.94); border-radius: 10px; padding: 16px; z-index: 5;
+             overflow-y: auto; }
+  #overlay h2 { color: #ffe14d; margin: 0; font-size: 22px; }
+  #overlay p { max-width: 440px; font-size: 14px; line-height: 1.5; color: #cde; }
+  #levelBtns { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 460px; }
+  .grp { display: flex; flex-direction: column; gap: 6px; }
+  .grpHead { display: flex; justify-content: space-between; align-items: center;
+             min-height: 48px; background: #25255f; color: #fff;
+             border: 1px solid #5555ff; border-radius: 10px;
+             padding: 10px 14px; font-family: monospace; font-size: 14px; cursor: pointer;
+             touch-action: manipulation; }
+  .grpHead .cnt { background: #0a0a2e; border: 1px solid #5555ff; border-radius: 8px;
+                  padding: 2px 8px; font-size: 12px; color: #8ef; }
+  .grp.open .grpHead { background: #ffe14d; color: #111; font-weight: bold; }
+  .grp.open .grpHead .cnt { color: #111; border-color: #111; background: transparent; }
+  .grpBody { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .lvl { background: #1c1c55; color: #fff; border: 1px solid #5555ff; border-radius: 8px;
+         padding: 7px 10px; font-family: monospace; font-size: 12px; cursor: pointer; }
+  .lvl.sel { background: #ffe14d; color: #111; font-weight: bold; }
+  #lvlDesc { max-width: 460px; font-size: 13px; color: #ffe14d; min-height: 34px; }
+  #taskRow { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  #taskCode { background: #141444; color: #fff; border: 1px solid #5555ff; border-radius: 8px;
+              padding: 7px 10px; font-family: monospace; font-size: 14px; width: 170px; text-align: center; }
+  #taskMsg { font-size: 13px; min-height: 18px; max-width: 460px; }
+  #menuStats { font-size: 12px; color: #8ef; }
+  #playerLine { font-size: 13px; color: #ff9de2; margin-bottom: 6px; }
+  #profile { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  #profile label { font-size: 13px; color: #cde; }
+  #pname { background: #141444; color: #fff; border: 1px solid #5555ff; border-radius: 8px;
+           padding: 6px 10px; font-family: monospace; font-size: 14px; width: 180px; text-align: center; }
+  #avatars { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  #avatars button { background: #1c1c55; color: #fff; border: 1px solid #5555ff; border-radius: 8px;
+                    width: 34px; height: 34px; font-size: 17px; cursor: pointer; }
+  #avatars button.sel { background: #ffe14d; color: #111; font-weight: bold; }
+  #hero { line-height: 0; }
+  .big { background: #ffe14d; color: #111; font-weight: bold; border: 0; border-radius: 10px;
+         padding: 12px 26px; font-size: 16px; font-family: monospace; cursor: pointer; }
+  .ghost { background: transparent; color: #8ef; border: 1px solid #5555ff; border-radius: 10px;
+           padding: 8px 16px; font-family: monospace; cursor: pointer; }
+  #controls { display: flex; gap: 8px; margin: 8px 0 2px; }
+  #pad { display: none; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 48px);
+         gap: 4px; margin: 8px 0 16px; }
+  #pad button { background: #1c1c55; color: #ffe14d; border: 1px solid #5555ff; border-radius: 10px;
+                font-size: 20px; touch-action: none; }
+  #pad .up { grid-column: 2; } #pad .left { grid-column: 1; grid-row: 2; }
+  #pad .right { grid-column: 3; grid-row: 2; } #pad .down { grid-column: 2; grid-row: 3; }
+  footer { font-size: 11px; color: #667; padding: 6px 12px 18px; text-align: center; max-width: 640px; }
+  kbd { background: #222; border: 1px solid #555; border-radius: 4px; padding: 0 5px; }
+  @media (pointer: coarse), (max-width: 720px) { #pad { display: grid; } .hint { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>MATE PAC-MAN</h1>
+  <div id="playerLine">Jugador: Anónimo Σ</div>
+  <div id="levelName">Nivel 1-1 · Sumas 1-10</div>
+  <div id="hud">
+    <div class="box">Aciertos <b id="hits">0/5</b></div>
+    <div class="box">Vidas <b id="lives">●●●</b></div>
+    <div class="box">Puntos <b id="score">0</b></div>
+    <div class="box">Tiempo <b id="time">0:00</b></div>
+    <div class="box">Récord <b id="best">0</b></div>
+    <div class="box" id="frenzy" style="display:none;background:#3a0a0a;border-color:#ff2222">¡Nerviosos!</div>
+  </div>
+  <div><span id="op">—</span></div>
+</header>
+
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div id="overlay">
+    <div id="hero">
+      <svg width="128" height="66" viewBox="0 0 170 86" role="img" aria-label="Pac-Man matemático">
+        <circle cx="138" cy="24" r="17" fill="#141444" stroke="#8ef" stroke-width="2"/>
+        <text x="138" y="32" font-size="22" text-anchor="middle" fill="#8ef" font-family="monospace">Σ</text>
+        <path d="M62 43 L82 29 A24 24 0 1 0 82 57 Z" fill="#ffe14d"/>
+        <circle cx="54" cy="30" r="4" fill="#111"/>
+        <circle cx="102" cy="43" r="11" fill="#ff9de2"/>
+        <text x="102" y="48" font-size="12" text-anchor="middle" fill="#111" font-family="monospace">π</text>
+        <circle cx="126" cy="62" r="9" fill="#00e5ff"/>
+        <text x="126" y="66" font-size="11" text-anchor="middle" fill="#111" font-family="monospace">½</text>
+        <circle cx="22" cy="62" r="4" fill="#ffd9a0"/>
+        <circle cx="36" cy="68" r="4" fill="#ffd9a0"/>
+      </svg>
+    </div>
+    <h2 id="ovTitle">Mate Pac-Man</h2>
+    <p id="ovText">Lee la operación de arriba y cómete la píldora con la respuesta correcta. Evita a los fantasmas. La estrella dorada quita dos respuestas falsas pero dura 12 segundos. Cerca de la meta se ponen nerviosos.</p>
+    <div id="profile">
+      <label>Tu nombre: <input id="pname" maxlength="16" placeholder="Escribe tu nombre"></label>
+      <div id="avatars"></div>
+    </div>
+    <div id="levelBtns"></div>
+    <div id="lvlDesc"></div>
+    <div id="taskRow">
+      <input id="taskCode" maxlength="12" placeholder="Código de tarea: 8-7">
+      <button class="ghost" id="btnTask">Jugar tarea</button>
+    </div>
+    <div id="taskMsg"></div>
+    <div id="sendRow"><button class="ghost" id="btnSend">Enviar mis resultados al docente</button></div>
+    <label id="calmRow" style="font-size:13px;color:#cde"><input type="checkbox" id="chkCalm"> Modo tranquilo (sin fantasmas)</label>
+    <button class="big" id="btnStart">JUGAR</button>
+    <button class="big" id="btnNext" style="display:none">Siguiente</button>
+    <div id="menuStats"></div>
+    <button class="ghost" id="btnResume" style="display:none">Seguir</button>
+    <button class="ghost" id="btnMenu">Menú</button>
+  </div>
+</div>
+
+<div id="controls">
+  <button class="ghost" id="btnPause">Pausa (P)</button>
+</div>
+
+<div id="pad">
+  <button class="up" data-dir="0,-1">▲</button>
+  <button class="left" data-dir="-1,0">◀</button>
+  <button class="right" data-dir="1,0">▶</button>
+  <button class="down" data-dir="0,1">▼</button>
+</div>
+
+<p class="hint" style="font-size:12px;color:#789">Mueve con <kbd>←↑↓→</kbd> o <kbd>WASD</kbd> · En móvil: desliza el dedo o usa la cruceta · <kbd>Enter</kbd> para empezar · <a href="docente.html" style="color:#8ef">Panel docente</a></p>
+
+<footer>
+  Prototipo Niveles 0 al 5 (cada uno con 5 subniveles: tutorial, aritmética, fracciones, signos, álgebra y trigonometría) ·
+  Cada nivel tiene su color de laberinto y todas las respuestas se ven iguales (hay que calcular) ·
+  Las preguntas se generan aleatorias en cada partida ·
+  Tu nombre, avatar, récords y estadísticas se guardan en tu navegador (localStorage, no salen de tu PC) ·
+  Sirve esta carpeta con <code>python3 -m http.server</code> y abre <code>http://localhost:8000</code> en Brave, Firefox, Chrome o Edge.
+</footer>
+
+<script src="mate.js"></script>
+</body>
+</html>
